@@ -53,6 +53,9 @@ class EntityStreamDocsTest extends AbstractBaseDocumentTest {
   @Autowired
   Doc3Repository doc3Repository;
 
+  @Autowired
+  ExampleProjectRepository exampleProjectRepository;
+
   String redisId;
   String microsoftId;
   String teslaId;
