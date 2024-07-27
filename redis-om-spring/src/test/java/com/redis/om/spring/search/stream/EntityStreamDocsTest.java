@@ -6,6 +6,7 @@ import com.redis.om.spring.AbstractBaseDocumentTest;
 import com.redis.om.spring.fixtures.document.model.*;
 import com.redis.om.spring.fixtures.document.repository.CompanyRepository;
 import com.redis.om.spring.fixtures.document.repository.Doc3Repository;
+import com.redis.om.spring.fixtures.document.repository.ExampleProjectRepository;
 import com.redis.om.spring.fixtures.document.repository.NiCompanyRepository;
 import com.redis.om.spring.fixtures.document.repository.UserRepository;
 import com.redis.om.spring.tuple.Fields;
@@ -2627,6 +2628,34 @@ class EntityStreamDocsTest extends AbstractBaseDocumentTest {
       assertThat(d.getSecond()).isNull();
       // id is always projected
       assertThat(d.getId()).isNotNull();
+    });
+  }
+
+  @Test
+  void testExampleProjectProperties() {
+    // given
+    if (exampleProjectRepository.count() == 0) {
+      exampleProjectRepository.saveAll(List.of(
+              new ExampleProject(1L, 1, "1"),
+              new ExampleProject(2L, 1, "2"),
+              new ExampleProject(3L, 1, "3"),
+              new ExampleProject(4L, 4, "4")
+      ));
+    }
+    // when
+    List<ExampleProject> docs = entityStream //
+        .of(ExampleProject.class) //
+        .project(Fields.of(ExampleProject$.ID, ExampleProject$.IS_DELETED)) //
+        .collect(Collectors.toList());
+    // then
+    assertEquals(4, docs.size());
+
+    docs.forEach(d -> {
+      // projection fields are not null
+      assertThat(d.getId()).isNotNull();
+      assertThat(d.getIsDeleted()).isNotNull();
+      // non-projection nullable fields are null
+      assertThat(d.getName()).isNull();
     });
   }
 
